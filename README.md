@@ -14,6 +14,30 @@ optional arguments:
   -h, --help            show this help message and exit
                         saving rate specified like frame/save_per_sec
 ```
-realsenseから得たデータをキャプチャしつつ、指定したインターバルで記録する。例えば、`capture_and_record.py -s 5`、あるいは`capture_and_record.py --save_per_sec 5`のように指定すると、1秒間に5回記録する。
+realsenseから得たデータをキャプチャしつつ、指定したインターバルで記録する。例えば、`python capture_and_record.py -s 5`、あるいは`python capture_and_record.py --save_per_sec 5`のように指定すると、1秒間に5回記録する。
 
-記録は**log**フォルダの中に作成された**西暦-月-日_時-分**フォルダに**西暦-月-日_時-分-ミリ秒-{img / depth}.png**として記録される。
+記録は**log**フォルダの中に作成された**西暦-月-日_時-分**フォルダに**西暦-月-日_時-分-ミリ秒-{img / depth}.png**として記録される。次図はその一例。
+
+![2022-10-04_17-12-12-287246-img.png](./assets/2022-10-04_17-12-12-287246-img.png)
+![2022-10-04_17-12-12-287246-depth.png](./assets/2022-10-04_17-12-12-287246-depth.png)
+
+depthを可視化する際には[JETなどの疑似カラー（カラーマップ）](https://docs.opencv.org/4.x/d3/d50/group__imgproc__colormap.html)が用いられるが、128階調だと分解能が足りない。ここでは次のようにmatplotlibに用意されているカラーマップ"gist_rainbow"を10000階調で作成し、uint8化して得た重複のない1377階調を得ることにした。カラーマップの階調を増やす方法（あるいは階調の大きいカラーマップ）について引き続き調査中。
+
+https://github.com/ail-and-colleagues/simple_realsense/blob/d66de80901f03c97c18221fd9dd8c8ff71174002/utils.py#L88-L100
+
+画像が保存されるフォルダには併せて実行時の設定やrealsenseの内部パラメータ(intrinsics)を記録した**conf.yaml**も保存される。
+
+## rgbd_to_ply.py
+```
+usage: rgbd_to_ply.py [-h] -i IMAGE
+
+convert image and depth_map to ply
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IMAGE, --image IMAGE
+                        a color image path
+```
+capture_and_record.pyにて作成した画像と深度（のカラーマップ）から三次元点群を生成する。`python rgbd_to_ply.py -i 西暦-月-日_時-分-ミリ秒-img.png`ないし`python rgbd_to_ply.py --image 西暦-月-日_時-分-ミリ秒-img.png`のように画像データを指定すると、それに対応する**～～-depth.png**と**conf.yaml**から次図のような三次元点群を作成し、同フォルダに**西暦-月-日_時-分-ミリ秒-{img / depth}.ply**として保存する。
+
+![2022-10-04 181939.png](./assets/2022-10-04%20181939.png)
