@@ -55,3 +55,5 @@ optional arguments:
                         saving interval
 ```
 realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。書き出しディレクトリはひとまずハードコーディングで *./log/png_and_ply* 、ファイル名は *bag_file_name*_*frame_index*.png/.plyとなっている。
+
+![outputs](./assets/2022-12-07%20133951.png)
