@@ -41,3 +41,17 @@ optional arguments:
 capture_and_record.pyにて作成した画像と深度（のカラーマップ）から三次元点群を生成する。`python rgbd_to_ply.py -i 西暦-月-日_時-分-ミリ秒-img.png`ないし`python rgbd_to_ply.py --image 西暦-月-日_時-分-ミリ秒-img.png`のように画像データを指定すると、それに対応する**～～-depth.png**と**conf.yaml**から次図のような三次元点群を作成し、同フォルダに**西暦-月-日_時-分-ミリ秒-{img / depth}.ply**として保存する。
 
 ![2022-10-04 181939.png](./assets/2022-10-04%20181939.png)
+
+## bga_to_png_ply.py
+```
+usage: bag_to_png_ply.py [-h] -b BAG_FILE -i INTERVAL
+extract png and ply image from bag
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BAG_FILE, --bag_file BAG_FILE
+                        bag_file
+  -i INTERVAL, --interval INTERVAL
+                        saving interval
+```
+realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。書き出しディレクトリはひとまずハードコーディングで *./log/png_and_ply* 、ファイル名は *bag_file_name*_*frame_index*.png/.plyとなっている。
