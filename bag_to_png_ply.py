@@ -10,7 +10,8 @@ import cv2
 import trimesh
 import pyrealsense2 as rs
 import argparse
-
+import datetime
+import math
 from utils import rgbd_to_pcd
 
 parser = argparse.ArgumentParser(description='extract png and ply image from bag')
@@ -57,14 +58,27 @@ if __name__ == "__main__":
     inv_intrinsics = np.linalg.inv(intrinsics)
 
     basename = os.path.basename(args.bag_file).split('.')[-2]    
-    ite = 0
 
+    first_frame_number = None
+    tgt_frame_number = None
     while True:
         try:
             frames = pipeline.wait_for_frames()
+            # adp, dt = math.modf(frames.timestamp / 1000.0)
+            # dt = datetime.datetime.fromtimestamp(dt)
+            # print(dt, frames.frame_number, adp)
         except RuntimeError:
             print("reached EOF or caused a loading error.")
             break
+        if not first_frame_number:
+            first_frame_number = frames.frame_number
+            tgt_frame_number = frames.frame_number
+            print("first_frame_number: ", first_frame_number)
+
+        if tgt_frame_number > frames.frame_number:
+            continue
+        tgt_frame_number += args.interval
+
         frames = align.process(frames)
         color_frame = frames.get_color_frame()
         depth_frame = frames.get_depth_frame()
@@ -81,17 +95,16 @@ if __name__ == "__main__":
         if key == ord('q'):
             break
 
-        if ite % args.interval == 0:
-            # increase a digit when a frame index is overflowed (e.g., {:010d} to {:015d}). 
-            f = '{}_{:010d}.ply'.format(basename, ite)
-            dst = os.path.join(conf['dst_dir'], f)
-            points, point_colors = rgbd_to_pcd(inv_intrinsics, image, depth)
-            pcd = trimesh.points.PointCloud(points, point_colors)
-            pcd.export(dst)
-            dst = dst.replace('.ply', '.png')
-            cv2.imwrite(dst, image)
-            print("{} / .ply are exported".format(dst))
+        ofs = frames.frame_number - first_frame_number
+        # increase a digit when a frame index is overflowed (e.g., {:010d} to {:015d}). 
+        f = '{}_{:010d}.ply'.format(basename, ofs)
+        dst = os.path.join(conf['dst_dir'], f)
+        points, point_colors = rgbd_to_pcd(inv_intrinsics, image, depth)
+        pcd = trimesh.points.PointCloud(points, point_colors)
+        pcd.export(dst)
+        dst = dst.replace('.ply', '.png')
+        cv2.imwrite(dst, image)
+        print("{} / .ply are exported".format(dst))
 
-        ite += 1
 
     pipeline.stop()   
