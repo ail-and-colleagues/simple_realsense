@@ -15,7 +15,7 @@ import math
 from utils import rgbd_to_pcd
 
 parser = argparse.ArgumentParser(description='extract png and ply image from bag')
-parser.add_argument("-b", "--bag_file", help="bag_file of dir",  required=True, type=str)
+parser.add_argument("-b", "--bag_file", help="bag_file or dir",  required=True, type=str)
 parser.add_argument("-i", "--interval", help="saving interval",  required=True, type=int)
 
 def create_contents_list(dataPath):

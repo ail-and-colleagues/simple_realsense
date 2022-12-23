@@ -50,10 +50,10 @@ extract png and ply image from bag
 optional arguments:
   -h, --help            show this help message and exit
   -b BAG_FILE, --bag_file BAG_FILE
-                        bag_file
+                        bag_file or dir
   -i INTERVAL, --interval INTERVAL
                         saving interval
 ```
-realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 40* 程度になると思われる。書き出しディレクトリはひとまずハードコーディングで **./log/png_and_ply** 、ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
+realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 20* 程度になると思われる。書き出しディレクトリはひとまずハードコーディングで ./log/png_and_ply/{*bag_file_name*} 、ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
 
 ![outputs](./assets/2022-12-07%20133951.png)
