@@ -2,6 +2,7 @@
 import numpy as np
 import pyrealsense2 as rs
 import matplotlib as mpl
+import math
 
 class Realsense():
     def __init__(self, rgb_size, depth_size, fps, device_idx=0):
@@ -125,20 +126,16 @@ class ColorMapper:
         return ret.reshape([colored.shape[0], colored.shape[1]]) 
 
 
-def rgbd_to_pcd(inv_intrinsics, image, depth):
+def rgbd_to_pcd(uv_vecs, image, depth):
     points = list()
     point_col = list()
-    for v, row in enumerate(zip(image, depth)):
+    # print(image.shape, depth.shape)
+    h, w = depth.shape
+    image = image.reshape([-1, 3])
+    depth = depth.reshape([-1, 1])
 
-        for u, (c, d) in enumerate(zip(row[0], row[1])):
-            # print("c: ", c, ", d: ", d)
-            # print(u, v)
-            t = np.array([u, v, 1.0], dtype=np.float32)
-
-            dir = inv_intrinsics @ t
-            if d > 0.0:
-                points.append(d * dir)
-                point_col.append(c[::-1])
+    points = [d * v for d, v in zip(depth, uv_vecs)]
+    point_col = image[:, ::-1]
 
     points = np.array(points)
     point_col = np.array(point_col)

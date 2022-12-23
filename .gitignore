@@ -1,7 +1,7 @@
 .realsense
 log/**
 !.gitkeep
-
+bag/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

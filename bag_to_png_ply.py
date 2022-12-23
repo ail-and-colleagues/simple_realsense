@@ -15,18 +15,19 @@ import math
 from utils import rgbd_to_pcd
 
 parser = argparse.ArgumentParser(description='extract png and ply image from bag')
-parser.add_argument("-b", "--bag_file", help="bag_file",  required=True, type=str)
+parser.add_argument("-b", "--bag_file", help="bag_file of dir",  required=True, type=str)
 parser.add_argument("-i", "--interval", help="saving interval",  required=True, type=int)
 
-if __name__ == "__main__":
-    args = parser.parse_args()
-    conf = {
-        "dst_dir": "./log/png_and_ply/"
-    }
+def create_contents_list(dataPath):
+    t = os.listdir(dataPath)
+    t = [os.path.join(dataPath, c) for c in t]
+    files = [c for c in t if os.path.isfile(c)]
+    directories = [c for c in t if os.path.isdir(c)]
+    return files, directories
 
-    print("open : ", args.bag_file)
+def proc(conf, bag_file):
     config = rs.config()
-    config.enable_device_from_file(args.bag_file,  repeat_playback=False)
+    config.enable_device_from_file(bag_file,  repeat_playback=False)
 
     # config.enable_stream(...) is not required when read a bag file.
     # https://teratail.com/questions/218884
@@ -42,7 +43,6 @@ if __name__ == "__main__":
     depth_scale = depth_sensor.get_depth_scale() * 1000.0 # to mm
     print('depth_scale: ', depth_scale)
 
-
     # apply an align process to align fov of rgb and depth frames. 
     align_to = rs.stream.color
     align = rs.align(align_to)
@@ -50,15 +50,22 @@ if __name__ == "__main__":
     # calculate inv_intrinsics to convert rgbd images to plys.
     # Downcast to video_stream_profile and fetch intrinsics
     intrinsics = prof.get_stream(rs.stream.color).as_video_stream_profile().get_intrinsics()
-    intrinsics = np.array([
+    intrinsics_mtx = np.array([
         [intrinsics.fx, 0.0, intrinsics.ppx],
         [0.0, intrinsics.fy, intrinsics.ppy],
         [0.0, 0.0, 1.0],
     ])
-    inv_intrinsics = np.linalg.inv(intrinsics)
+    inv_intrinsics = np.linalg.inv(intrinsics_mtx)
+    # intrinsics.width
+    w, h = intrinsics.width, intrinsics.height
+    uv_vecs = [(np.mod(i, w), int(i / w), 1.0) for i in range(w * h)]
+    uv_vecs = [inv_intrinsics @ t for t in uv_vecs]
+    uv_vecs = np.array(uv_vecs)    
 
-    basename = os.path.basename(args.bag_file).split('.')[-2]    
-
+    basename = os.path.basename(bag_file).split('.')[-2]
+    dst_dir = os.path.join(conf['dst_dir'], basename)
+    os.makedirs(dst_dir, exist_ok=True)
+    
     first_frame_number = None
     tgt_frame_number = None
     while True:
@@ -98,8 +105,8 @@ if __name__ == "__main__":
         ofs = frames.frame_number - first_frame_number
         # increase a digit when a frame index is overflowed (e.g., {:010d} to {:015d}). 
         f = '{}_{:010d}.ply'.format(basename, ofs)
-        dst = os.path.join(conf['dst_dir'], f)
-        points, point_colors = rgbd_to_pcd(inv_intrinsics, image, depth)
+        dst = os.path.join(dst_dir, f)
+        points, point_colors = rgbd_to_pcd(uv_vecs, image, depth)
         pcd = trimesh.points.PointCloud(points, point_colors)
         pcd.export(dst)
         dst = dst.replace('.ply', '.png')
@@ -108,3 +115,20 @@ if __name__ == "__main__":
 
 
     pipeline.stop()   
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    conf = {
+        "dst_dir": "./log/png_and_ply/"
+    }
+
+    if os.path.isfile(args.bag_file):        
+        print("open : ", args.bag_file)
+        proc(conf, args.bag_file)
+    else:
+        files, _ = create_contents_list(args.bag_file)
+        files = [f for f in files if os.path.splitext(f)[1] == '.bag']
+        print('{} in {}'.format(files, args.bag_file))
+        for f in files:
+            print("open : ", f)
+            proc(conf, f)
