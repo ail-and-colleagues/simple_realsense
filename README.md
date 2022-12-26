@@ -44,7 +44,8 @@ capture_and_record.pyにて作成した画像と深度（のカラーマップ�
 
 ## bga_to_png_ply.py
 ```
-usage: bag_to_png_ply.py [-h] -b BAG_FILE -i INTERVAL
+usage: bag_to_png_ply.py [-h] -b BAG_FILE -i INTERVAL -o OUT_DIR
+
 extract png and ply image from bag
 
 optional arguments:
@@ -53,7 +54,10 @@ optional arguments:
                         bag_file or dir
   -i INTERVAL, --interval INTERVAL
                         saving interval
+  -o OUT_DIR, --out_dir OUT_DIR
+                        output directory
 ```
-realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 20* 程度になると思われる。書き出しディレクトリはひとまずハードコーディングで ./log/png_and_ply/{*bag_file_name*} 、ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
+realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 20* 程度になると思われる。
+書き出しディレクトリは`-o`で指定する。ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
 
 ![outputs](./assets/2022-12-07%20133951.png)
