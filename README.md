@@ -42,7 +42,7 @@ capture_and_record.pyにて作成した画像と深度（のカラーマップ�
 
 ![2022-10-04 181939.png](./assets/2022-10-04%20181939.png)
 
-## bga_to_png_ply.py
+## bag_to_png_ply.py
 ```
 usage: bag_to_png_ply.py [-h] -b BAG_FILE -i INTERVAL -o OUT_DIR
 
