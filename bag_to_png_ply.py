@@ -40,6 +40,12 @@ def proc(conf, bag_file):
 
     pipeline = rs.pipeline()
     prof = pipeline.start(config)
+    color_sensor = prof.get_device().first_color_sensor()
+
+    yuy = None
+    if 'YUYV' in str(color_sensor.get_stream_profiles()[0]):
+        yuy = rs.yuy_decoder()
+
     depth_sensor = prof.get_device().first_depth_sensor()
     depth_scale = depth_sensor.get_depth_scale() * 1000.0 # to mm
     print('depth_scale: ', depth_scale)
@@ -92,9 +98,15 @@ def proc(conf, bag_file):
         depth_frame = frames.get_depth_frame()
         if not depth_frame or not color_frame:
             continue
+        
 
-        image = np.array(color_frame.get_data())
+        if yuy:
+            image = np.array(yuy.process(color_frame).get_data())
+        else:
+            image = np.array(color_frame.get_data())
+
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
         depth = np.array(depth_frame.get_data()) * depth_scale
         cv2.imshow("image", image)
         cv2.imshow("depth", depth / 4000.0)

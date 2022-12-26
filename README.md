@@ -58,6 +58,6 @@ optional arguments:
                         output directory
 ```
 realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 20* 程度になると思われる。
-書き出しディレクトリは`-o`で指定する。ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
+書き出しディレクトリは`-o`で指定する(`-o D://temp`で他のドライブの指定可能)。ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
 
 ![outputs](./assets/2022-12-07%20133951.png)
