@@ -129,9 +129,7 @@ class ColorMapper:
 def rgbd_to_pcd(uv_vecs, image, depth):
     points = list()
     point_col = list()
-    # print(image.shape, image[:10])
-    h, w = depth.shape
-    # print(point_col.shape, point_col[:10])
+
     image = image.reshape([-1, 3])
     depth = depth.reshape([-1, 1])
 
@@ -140,6 +138,5 @@ def rgbd_to_pcd(uv_vecs, image, depth):
 
     points = np.array(points)
     point_col = np.array(point_col)
-    # print(point_col.shape, point_col[:10])
 
     return points, point_col
