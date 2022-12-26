@@ -17,6 +17,7 @@ from utils import rgbd_to_pcd
 parser = argparse.ArgumentParser(description='extract png and ply image from bag')
 parser.add_argument("-b", "--bag_file", help="bag_file or dir",  required=True, type=str)
 parser.add_argument("-i", "--interval", help="saving interval",  required=True, type=int)
+parser.add_argument("-o", "--out_dir", help="output directory",  required=True, type=str)
 
 def create_contents_list(dataPath):
     t = os.listdir(dataPath)
@@ -119,7 +120,7 @@ def proc(conf, bag_file):
 if __name__ == "__main__":
     args = parser.parse_args()
     conf = {
-        "dst_dir": "./log/png_and_ply/"
+        "dst_dir": args.out_dir,
     }
 
     if os.path.isfile(args.bag_file):        
