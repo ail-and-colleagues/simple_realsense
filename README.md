@@ -57,7 +57,7 @@ optional arguments:
   -o OUT_DIR, --out_dir OUT_DIR
                         output directory
 ```
-.bagとはロボット用のアプリケーション開発ライブラリであるROS（Robot Operating System、https://www.ros.org/）にて内部的な（コンポーネント間の）通信に用いられるメッセージを保存するためのフォーマット。RealSense向けに公式に提供しているビューワーでは .bag形式でRGBとDepthを出力する機能が用意されている。
+.bagとはロボット用のアプリケーション開発ライブラリであるROS（Robot Operating System、https://www.ros.org/ ）にて内部的な（コンポーネント間の）通信に用いられるメッセージを保存するためのフォーマット。RealSense向けに公式に提供しているビューワーでは .bag形式でRGBとDepthを出力する機能が用意されている。
 realsense viewerで録画した.bagファイルを指定したインターバルで.pngと.plyに書き出す。ただし、pyrealsense2で.bagを読み出す場合、デバイスを接続するのと同様に`wait_for_frames()`からは最新のフレームが返却される（i.e. cv2のread()のように次のフレームを返すわけではない）ため、実際のインターバルはPCの処理能力に寄り、現実的には *-i 20* 程度になると思われる。
 書き出しディレクトリは`-o`で指定する(`-o D://temp`で他のドライブの指定可能)。ファイル名は {*bag_file_name*}_{*frame_index*}.png/.plyとなっている。
 
